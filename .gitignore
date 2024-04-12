@@ -14,3 +14,6 @@ package-lock.json
 # Ignore static file
 input.txt
 
+# Ignore db contents
+db/*
+

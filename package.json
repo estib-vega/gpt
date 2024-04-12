@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js",
-    "script": "ts-node src/index.ts"
+    "script": "ts-node src/index.ts",
+    "rag": "ts-node src/rag.ts"
   },
   "repository": {
     "type": "git",
@@ -33,5 +34,14 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
     "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "@langchain/community": "^0.0.44",
+    "cheerio": "^1.0.0-rc.12",
+    "hnswlib-node": "^1.4.2",
+    "langchain": "^0.1.31"
+  },
+  "resolutions": {
+    "@langchain/core": "0.1.54"
   }
 }
