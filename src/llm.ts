@@ -1,41 +1,71 @@
+import { raise } from "./utils/errors";
 import { streamGenerator } from "./utils/promise";
 import { isNonEmptyObject } from "./utils/typing";
 
-const LLM_ENDPOINT = "http://localhost:11434/api/generate";
-const LLM_MODEL = "llama2:13b";
-const LLM_TEMP = 0.15;
+const DEFAULT_LLM_ENDPOINT = "http://localhost:11434/api/";
+const LLM_MODEL = "llama3";
+const LLM_TEMP = 0;
+
+enum LLMAPEndpoint {
+  Generate = "generate",
+  Chat = "chat",
+  Embed = "embeddings",
+}
+
+interface LLMRequestOptions {
+  /**
+   * The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)
+   */
+  temperature: number;
+}
 
 interface BaseLLMResponse {
   created_at: string;
   done: boolean;
   model: string;
-  response: string;
 }
 
-function isBaseLLMResponse(response: unknown): response is LLMResponseOngoing {
+function isBaseLLMResponse(response: unknown): response is BaseLLMResponse {
   if (!isNonEmptyObject(response)) {
     return false;
   }
   return (
     typeof response.created_at === "string" &&
     typeof response.done === "boolean" &&
-    typeof response.model === "string" &&
-    typeof response.response === "string"
+    typeof response.model === "string"
   );
 }
 
-interface LLMResponseOngoing extends BaseLLMResponse {
+// =====
+// GENERATE
+// =====
+
+interface LLMGenerateRequest {
+  model: string;
+  prompt: string;
+  stream: boolean;
+  context?: number[];
+  options?: LLMRequestOptions;
+}
+
+interface LLMGenerateResponseOngoing extends BaseLLMResponse {
+  response: string;
   done: false;
 }
 
-function isLLMResponseOngoing(
+function isLLMGenerateResponseOngoing(
   response: unknown
-): response is LLMResponseOngoing {
-  return isBaseLLMResponse(response) && !response.done;
+): response is LLMGenerateResponseOngoing {
+  if (!isBaseLLMResponse(response) || !isNonEmptyObject(response)) {
+    return false;
+  }
+
+  return !response.done && typeof response.response === "string";
 }
 
-interface LLMResponseCompleted extends BaseLLMResponse {
+interface LLMGenerateResponseCompleted extends BaseLLMResponse {
   done: true;
+  response: string;
   context: number[];
   eval_count: number;
   eval_duration: number;
@@ -44,14 +74,15 @@ interface LLMResponseCompleted extends BaseLLMResponse {
   total_duration: number;
 }
 
-function isLLMResponseCompleted(
+function isLLMGenerateResponseCompleted(
   response: unknown
-): response is LLMResponseCompleted {
+): response is LLMGenerateResponseCompleted {
   if (!isBaseLLMResponse(response) || !isNonEmptyObject(response)) {
     return false;
   }
 
   return (
+    typeof response.response === "string" &&
     typeof response.eval_count === "number" &&
     typeof response.eval_duration === "number" &&
     typeof response.load_duration === "number" &&
@@ -63,21 +94,56 @@ function isLLMResponseCompleted(
   );
 }
 
-type LLMResponse = LLMResponseOngoing | LLMResponseCompleted;
+type LLMGenerateResponse =
+  | LLMGenerateResponseOngoing
+  | LLMGenerateResponseCompleted;
 
-interface LLMRequestOptions {
-  /**
-   * The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)
-   */
-  temperature: number;
+// =====
+// CHAT
+// =====
+
+export enum LLMChatRole {
+  System = "system",
+  User = "user",
+  Assistant = "assistant",
 }
 
-interface LLMRequest {
+export interface LLMChatMessage {
+  role: LLMChatRole;
+  content: string;
+}
+
+interface LLMChatRequest {
   model: string;
-  prompt: string;
+  messages: LLMChatMessage[];
   stream: boolean;
-  context?: number[];
+  format?: "json";
   options?: LLMRequestOptions;
+}
+
+interface LLMChatResponse extends BaseLLMResponse {
+  message: LLMChatMessage;
+  done: true;
+}
+
+function isLLMChatResponse(response: unknown): response is LLMChatResponse {
+  if (!isBaseLLMResponse(response) || !isNonEmptyObject(response)) {
+    return false;
+  }
+
+  return (
+    isNonEmptyObject(response.message) &&
+    typeof response.message.role === "string" &&
+    typeof response.message.content === "string"
+  );
+}
+
+interface LLMGenerateParams {
+  prompt: string;
+  temperature?: number;
+  callback: (value: string) => void;
+  onDone?: (value: string, context: number[]) => void;
+  context?: number[];
 }
 
 export default class LLMHandler {
@@ -102,7 +168,7 @@ export default class LLMHandler {
    * @param request - The LLMRequest object.
    * @returns The request body as a JSON string.
    */
-  private getRequestBody(request: LLMRequest): string {
+  private getRequestBody(request: LLMGenerateRequest | LLMChatRequest): string {
     return JSON.stringify(request);
   }
 
@@ -113,19 +179,74 @@ export default class LLMHandler {
    * @returns The decoded LLMResponse object.
    * @throws Error if the response is invalid.
    */
-  private decodeStream(value: Uint8Array): LLMResponse {
+  private decodeStream(value: Uint8Array): LLMGenerateResponse {
     const text = new TextDecoder().decode(value);
     const parsed = JSON.parse(text);
 
-    if (isLLMResponseOngoing(parsed)) {
+    if (isLLMGenerateResponseOngoing(parsed)) {
       return parsed;
     }
 
-    if (isLLMResponseCompleted(parsed)) {
+    if (isLLMGenerateResponseCompleted(parsed)) {
       return parsed;
     }
 
     throw new Error("Invalid response");
+  }
+
+  private fetchChat(request: LLMChatRequest): Promise<Response> {
+    const url = new URL(LLMAPEndpoint.Chat, DEFAULT_LLM_ENDPOINT);
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: this.getRequestBody(request),
+    });
+  }
+
+  /**
+   * Fetches data from the server by sending a POST request to the LLMAPEndpoint.Generate endpoint.
+   *
+   * @param request - The LLMGenerateRequest object containing the request data.
+   * @returns A Promise that resolves to a Response object representing the server's response.
+   */
+  private fetchGenerate(request: LLMGenerateRequest): Promise<Response> {
+    const url = new URL(LLMAPEndpoint.Generate, DEFAULT_LLM_ENDPOINT);
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: this.getRequestBody(request),
+    });
+  }
+
+  /**
+   * Sends a chat message to the LLM model and returns the response.
+   *
+   * @param messages - An array of LLMChatMessage objects representing the chat messages.
+   * @param options - Optional LLMRequestOptions object for specifying additional options.
+   * @throws Error if the response is invalid.
+   * @returns A Promise that resolves to an LLMResponse object representing the response from the LLM model.
+   */
+  chat(
+    messages: LLMChatMessage[],
+    options?: LLMRequestOptions
+  ): Promise<LLMChatResponse> {
+    return this.fetchChat({
+      model: LLM_MODEL,
+      stream: false,
+      messages,
+      options,
+      format: "json",
+    })
+      .then((response) => response.json())
+      .then((json) =>
+        isLLMChatResponse(json)
+          ? json
+          : raise("Invalid response\n" + JSON.stringify(json))
+      );
   }
 
   /**
@@ -136,32 +257,21 @@ export default class LLMHandler {
    * @param onDone - A callback function that will be called when the stream generation is complete.
    * @returns A promise that resolves when the stream generation is complete.
    */
-  async generateStream(
-    prompt: string,
-    callback: (value: string) => void,
-    onDone?: (value: string, context: number[]) => void,
-    context?: number[]
-  ): Promise<void> {
+  async generateStream(params: LLMGenerateParams): Promise<void> {
     if (this.generationInProgress) {
       console.log("Generation in progress");
       return;
     }
 
     this.generationInProgress = true;
-    const response = await fetch(LLM_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await this.fetchGenerate({
+      model: LLM_MODEL,
+      prompt: params.prompt,
+      stream: true,
+      context: params.context,
+      options: {
+        temperature: params.temperature ?? LLM_TEMP,
       },
-      body: this.getRequestBody({
-        model: LLM_MODEL,
-        prompt,
-        stream: true,
-        context,
-        options: {
-          temperature: LLM_TEMP,
-        },
-      }),
     }).then((response) => response.body);
 
     if (!response) {
@@ -173,13 +283,28 @@ export default class LLMHandler {
     for await (const value of streamGenerator(response.getReader())) {
       const parsed = this.decodeStream(value);
       buffer.push(parsed.response);
-      callback(parsed.response);
+      params.callback(parsed.response);
 
       if (parsed.done) {
         const completed = buffer.join("");
-        onDone?.(completed, parsed.context);
+        params.onDone?.(completed, parsed.context);
         this.generationInProgress = false;
       }
     }
+  }
+
+  async embed(text: string): Promise<number[]> {
+    const url = new URL(LLMAPEndpoint.Embed, DEFAULT_LLM_ENDPOINT);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: LLM_MODEL,
+        text,
+      }),
+    }).then((response) => response.json());
+    return response.embedding;
   }
 }
