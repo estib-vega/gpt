@@ -1,96 +1,173 @@
-import readline from "readline";
-import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
-import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
-import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
+import { loadWikiArticle } from "./loaders/wiki";
+import extractInformation, { ParagraphInfo } from "./tools/paragraphInfo";
+import { splitIntoParragraphs } from "./utils/string";
+import VectorDB, { VectorStoreEntry } from "./lib/vectorDb";
 import LLMHandler from "./llm";
-import { load } from "langchain/load";
+import { raise } from "./utils/errors";
+import expandPrompt from "./tools/expandPrompt";
+import getSearchTerms from "./tools/getSearchTerms";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-function askQuestion(question: string): Promise<string> {
-  return new Promise((resolve) => {
-    rl.question(question, resolve);
-  });
+interface ChunkInfo {
+  content: string;
+  info: ParagraphInfo;
 }
 
-const DB_PATH = "/Users/estib/projects/gpt/db";
-const WIKI_ARTICLE = "https://en.wikipedia.org/wiki/2024_Hualien_earthquake";
+async function digestWikiArticle(
+  title: string,
+  url: string
+): Promise<ChunkInfo[]> {
+  const minLen = 100;
 
-async function getVectorStore(
-  texts: string[],
-  metadata: object
-): Promise<HNSWLib> {
-  const embeddings = new OllamaEmbeddings({
-    model: "llama2", // default value
-    baseUrl: "http://localhost:11434", // default value
-  });
+  const topic = "a Wikipedia Article about " + title;
+  const doc = await loadWikiArticle(url);
 
-  // const maybeVectorStore = await HNSWLib.load(DB_PATH, embeddings).catch((err) => {
-  //   console.error("Error loading vector store", err);
-  //   return undefined;
-  // });
-
-  // if (maybeVectorStore) {
-  //   console.log("Loaded vector store from disk");
-  //   return maybeVectorStore;
-  // }
-
-  console.log("Loading vector store...");
-  return HNSWLib.fromTexts(texts, metadata, embeddings);
-}
-
-function loadWikiArticle() {
-  const loader = new CheerioWebBaseLoader(WIKI_ARTICLE, {
-    selector: "#content h1, #content h2, #content p",
-  });
-  return loader.load();
-}
-
-function splitIntoParragraphs(text: string | undefined): string[] {
-  if (!text) return [];
-  return text.split("\n");
-}
-
-async function digestWikiArticle() {
-  const doc = await loadWikiArticle();
-  console.log("Content length", doc[0]?.pageContent.length);
-  const chunkSize = 1000;
-  const overlap = 100;
-  console.log(
-    `Splitting in chunks of size ${chunkSize} with overlap ${overlap}...`
-  );
   const chunks = splitIntoParragraphs(doc[0]?.pageContent);
-  const llm = LLMHandler.getInstance();
+  const documentInfo: ChunkInfo[] = [];
 
-  let context: number[] | undefined = undefined;
-
+  let count = 0;
   for (const chunk of chunks) {
-    console.log("Chunk:\n", chunk);
-    console.log("Chunk length", chunk.length);
-    if (chunk.length < 100) {
-      console.log("Skipping chunk");
+    if (chunk.length < minLen) {
+      console.log("Skipping chunk\n");
+      console.log(`[${++count}/ ${chunks.length}]`);
       continue;
     }
 
-    await llm.generateStream(
-      `This is a Wikipedia Article about the 2024 Hualien earthquake.
-Please propose a title for the following section and extract all key information.:
-${chunk}`,
-      (c) => process.stdout.write(c),
-      (_, ctx) => (context = ctx),
-      context
-    );
+    const now = new Date();
+    console.log("Processing chunk:", chunk);
+    try {
+      const paragraphInfo = await extractInformation(topic, chunk);
+      documentInfo.push({
+        content: chunk,
+        info: paragraphInfo,
+      });
+      console.log("Summary:", paragraphInfo.summary);
+      console.log("Facts:\n", paragraphInfo.facts.join("\n"));
+      console.log("\n");
+    } catch (error) {
+      console.error(error);
+    }
+
+    const elapsed = new Date().getTime() - now.getTime();
+    console.log("Time elapsed", elapsed, "ms");
+    console.log(`[${++count}/ ${chunks.length}]`);
     console.log("\n\n\n ------------------- \n\n\n");
   }
-  // return getVectorStore(chunks, doc[0]?.metadata ?? {});
+
+  return documentInfo;
+}
+
+enum WikiDocumentEntryType {
+  Fact = "fact",
+  Chunk = "chunk",
+}
+
+interface WikiDocumentEntryMetadata {
+  type: WikiDocumentEntryType;
+  id: string;
+  title: string;
+  url: string;
+  paragraphInfo: ParagraphInfo;
+  contentLength: number;
+}
+
+async function getDocDB(
+  id: string,
+  title: string,
+  url: string
+): Promise<VectorDB> {
+  const dbPath = "/Users/estib/projects/gpt/db/wiki/" + id;
+  const dbExists = await VectorDB.exists(dbPath);
+  if (dbExists) {
+    return VectorDB.get(dbPath);
+  }
+
+  const vectorEntries: VectorStoreEntry<WikiDocumentEntryMetadata>[] = [];
+  const documentInfo = await digestWikiArticle(title, url);
+
+  for (const chunkInfo of documentInfo) {
+    const text = `${chunkInfo.info.summary}: ${chunkInfo.content}`;
+    vectorEntries.push({
+      text,
+      metadata: {
+        type: WikiDocumentEntryType.Chunk,
+        id,
+        title,
+        url,
+        paragraphInfo: chunkInfo.info,
+        contentLength: text.length,
+      },
+    });
+
+    for (const fact of chunkInfo.info.facts) {
+      const text = `${chunkInfo.info.summary}: ${fact}`;
+      vectorEntries.push({
+        text,
+        metadata: {
+          type: WikiDocumentEntryType.Fact,
+          id,
+          title,
+          url,
+          paragraphInfo: chunkInfo.info,
+          contentLength: text.length,
+        },
+      });
+    }
+  }
+
+  const db = await VectorDB.getOrCreate(dbPath, vectorEntries);
+  db.save();
+  return db;
+}
+
+async function answer(prompt: string, context: string, topic: string) {
+  const llm = LLMHandler.getInstance();
+  await llm.generateStream({
+    prompt: `You are a reliable informant.
+Answer to the following PROMPT using *only* the information from the given CONTECT about the TOPIC.
+If the information is not enough, state clearly that the context is insufficient.
+It's important that you DON't infer or make up information.
+Be concise and to the point.
+
+TOPIC: ${topic}
+
+PROMPT: ${prompt}
+
+CONTEXT: ${context}
+`,
+    callback: (value) => {
+      process.stdout.write(value);
+    },
+    temperature: 0.05,
+  });
 }
 
 async function main() {
   console.log("starting...");
-  const vectorStore = await digestWikiArticle();
+
+  const prompt = process.argv[2] ?? raise("No prompt provided");
+
+  const id = "The_Dark_Knight";
+  const title = "The Dark Knight (film)";
+  const url = "https://en.wikipedia.org/wiki/The_Dark_Knight";
+
+  const db = await getDocDB(id, title, url);
+
+  const searchTerms = await getSearchTerms(prompt, title);
+
+  const facts = await db.getNearestNeighbors<WikiDocumentEntryMetadata>(
+    searchTerms.join(" "),
+    10
+  );
+
+  const factText = facts.map((f) => f.text).join("\n\n");
+
+  console.log("Prompt:\n", prompt);
+  const expandedPrompt = await expandPrompt(prompt, title);
+  console.log("Expanded Prompt:\n", expandedPrompt);
+  console.log("\n");
+  console.log("Facts:\n", factText);
+  console.log("\n");
+  await answer(expandedPrompt, factText, title);
 }
 
 main();
