@@ -6,6 +6,9 @@ import LLMHandler from "./llm";
 import { raise } from "./utils/errors";
 import expandPrompt from "./tools/expandPrompt";
 import getSearchTerms from "./tools/getSearchTerms";
+import { initLog } from "./utils/log";
+
+const l = initLog("rag");
 
 interface ChunkInfo {
   content: string;
@@ -27,30 +30,30 @@ async function digestWikiArticle(
   let count = 0;
   for (const chunk of chunks) {
     if (chunk.length < minLen) {
-      console.log("Skipping chunk\n");
-      console.log(`[${++count}/ ${chunks.length}]`);
+      l.log("Skipping chunk\n");
+      l.log(`[${++count}/ ${chunks.length}]`);
       continue;
     }
 
     const now = new Date();
-    console.log("Processing chunk:", chunk);
+    l.log("Processing chunk:", chunk);
     try {
       const paragraphInfo = await extractInformation(topic, chunk);
       documentInfo.push({
         content: chunk,
         info: paragraphInfo,
       });
-      console.log("Summary:", paragraphInfo.summary);
-      console.log("Facts:\n", paragraphInfo.facts.join("\n"));
-      console.log("\n");
+      l.log("Summary:", paragraphInfo.summary);
+      l.log("Facts:\n", paragraphInfo.facts.join("\n"));
+      l.log("\n");
     } catch (error) {
-      console.error(error);
+      l.err(error);
     }
 
     const elapsed = new Date().getTime() - now.getTime();
-    console.log("Time elapsed", elapsed, "ms");
-    console.log(`[${++count}/ ${chunks.length}]`);
-    console.log("\n\n\n ------------------- \n\n\n");
+    l.log("Time elapsed", elapsed, "ms");
+    l.log(`[${++count}/ ${chunks.length}]`);
+    l.log("\n\n\n ------------------- \n\n\n");
   }
 
   return documentInfo;
@@ -142,7 +145,8 @@ CONTEXT: ${context}
 }
 
 async function main() {
-  console.log("starting...");
+  l.log("Starting...");
+  const now = new Date();
 
   const prompt = process.argv[2] ?? raise("No prompt provided");
 
@@ -161,13 +165,14 @@ async function main() {
 
   const factText = facts.map((f) => f.text).join("\n\n");
 
-  console.log("Prompt:\n", prompt);
+  l.log("DB loaded");
   const expandedPrompt = await expandPrompt(prompt, title);
-  console.log("Expanded Prompt:\n", expandedPrompt);
-  console.log("\n");
-  console.log("Facts:\n", factText);
-  console.log("\n");
   await answer(expandedPrompt, factText, title);
+  l.log("Prompt expanded:", expandedPrompt);
 }
 
-main();
+main();  l.log("\n");
+  l.log("\n");
+  l.log("Context:\n", context);
+  l.log("\n");
+  l.log("Done", new Date().getTime() - now.getTime(), "ms");
