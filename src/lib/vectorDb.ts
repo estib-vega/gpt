@@ -2,7 +2,7 @@ import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import { raise } from "../utils/errors";
 
-const LLM_MODEL = "llama3";
+const LLM_MODEL = "nomic-embed-text";
 const OLLAMA_BASE_URL = "http://localhost:11434";
 
 export interface VectorStoreEntry<T extends object> {
@@ -14,9 +14,6 @@ function getEmbeddings(): OllamaEmbeddings {
   return new OllamaEmbeddings({
     model: LLM_MODEL,
     baseUrl: OLLAMA_BASE_URL,
-    requestOptions:{
-      temperature: 0,
-    }
   });
 }
 
