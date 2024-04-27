@@ -1,0 +1,19 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true
+    },
+    "project": "./tsconfig.json"
+  },
+  "env": { "node": true, "es6": true },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "no-undef": "error",
+    "prefer-const": "warn",
+    "no-console": "warn"
+  }
+}

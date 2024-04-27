@@ -4,7 +4,7 @@
   "description": "Simple implementation of a GPT in typescript",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "eslint src/ --ext .ts",
     "build": "webpack --config webpack.config.js",
     "script": "ts-node src/index.ts",
     "rag": "ts-node src/rag.ts"
