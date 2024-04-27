@@ -5,7 +5,6 @@ import VectorDB, { VectorStoreEntry } from "./lib/vectorDb";
 import LLMHandler from "./llm";
 import { raise } from "./utils/errors";
 import expandPrompt from "./tools/expandPrompt";
-import getSearchTerms from "./tools/getSearchTerms";
 import { initLog } from "./utils/log";
 
 const l = initLog("rag");
@@ -122,12 +121,23 @@ async function getDocDB(
   return db;
 }
 
+async function getContext(prompt: string, db: VectorDB): Promise<string> {
+  l.log("Searching for context...");
+  const numberOfHits = 10;
+  const hits = await db.getNearestNeighbors<WikiDocumentEntryMetadata>(
+    prompt,
+    numberOfHits
+  );
+
+  return hits.map((hit) => hit.text).join("\n");
+}
+
 async function answer(prompt: string, context: string, topic: string) {
   const llm = LLMHandler.getInstance();
   await llm.generateStream({
     prompt: `You are a reliable informant.
 Answer to the following PROMPT using *only* the information from the given CONTECT about the TOPIC.
-If the information is not enough, state clearly that the context is insufficient.
+ONLY if the information is not enough, state clearly that the context is insufficient.
 It's important that you DON't infer or make up information.
 Be concise and to the point.
 
@@ -144,7 +154,7 @@ CONTEXT: ${context}
   });
 }
 
-async function main() {
+export default async function rag() {
   l.log("Starting...");
   const now = new Date();
 
@@ -155,24 +165,14 @@ async function main() {
   const url = "https://en.wikipedia.org/wiki/The_Dark_Knight";
 
   const db = await getDocDB(id, title, url);
-
-  const searchTerms = await getSearchTerms(prompt, title);
-
-  const facts = await db.getNearestNeighbors<WikiDocumentEntryMetadata>(
-    searchTerms.join(" "),
-    10
-  );
-
-  const factText = facts.map((f) => f.text).join("\n\n");
-
   l.log("DB loaded");
   const expandedPrompt = await expandPrompt(prompt, title);
-  await answer(expandedPrompt, factText, title);
   l.log("Prompt expanded:", expandedPrompt);
-}
 
-main();  l.log("\n");
+  const context = await getContext(expandedPrompt, db);
   l.log("\n");
   l.log("Context:\n", context);
   l.log("\n");
+  await answer(expandedPrompt, context, title);
   l.log("Done", new Date().getTime() - now.getTime(), "ms");
+}
