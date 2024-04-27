@@ -46,9 +46,10 @@ export default async function getSearchTerms(
     {
       role: LLMChatRole.System,
       content: `You are a helpful expert in semantic search.
-Please, provide a list of search terms that could be used to find information about the given PROMT and TOPIC.
+Please, provide a list of 3 search terms that could be used to find information about the given PROMT and TOPIC.
 Don't focus on a single aspect of the prompt, try to cover a wide range of topics.
-Be thorough.
+Don't include any specific names or places unless they are mentioned.
+Use rephrasing and synonyms to cover different aspects of the topic.
 Use the following JSON schema in your response:
 ${SearchTermsResponseSchema}
 `,
@@ -77,12 +78,9 @@ ${SearchTermsResponseSchema}
       role: LLMChatRole.Assistant,
       content: JSON.stringify({
         searchTerms: [
-          "industries",
           "economy",
           "business",
-          "jobs",
           "employment",
-          "work",
         ],
       }),
     },

@@ -59,7 +59,7 @@ This is a paragraph from ${topic}.
 Given the following information, give a short and concise summary of what the paragraph is about and list the most important facts about the event.
 Use ONLY the information provided in the following paragraphs to generate the summary.
 Be thorough and concise.
-Return the information in the following scheme:
+Return the information in the following JSON schema:
 ${ParagraphInfoSchema}
 `,
     },
