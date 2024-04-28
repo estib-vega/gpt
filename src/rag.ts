@@ -123,7 +123,7 @@ async function getDocDB(
 
 async function getContext(prompt: string, db: VectorDB): Promise<string> {
   l.log("Searching for context...");
-  const numberOfHits = 10;
+  const numberOfHits = 25;
   const hits = await db.getNearestNeighbors<WikiDocumentEntryMetadata>(
     prompt,
     numberOfHits
@@ -154,25 +154,71 @@ CONTEXT: ${context}
   });
 }
 
-export default async function rag() {
+function getIDfromURL(url: string): string {
+  const parts = url.split("/");
+  return parts[parts.length - 1] ?? raise("Invalid URL: " + url);
+}
+
+function getTitlefromURL(url: string): string {
+  const id = getIDfromURL(url);
+  return id.replaceAll("_", " ");
+}
+
+/**
+ * Represents the parameters for Retrieval Augmented Generation.
+ */
+export interface RAGParams {
+  /**
+   * The prompt.
+   */
+  prompt: string;
+  /**
+   * The title of the topic.
+   */
+  title?: string;
+  /**
+   * The Wiki URL associated the topic.
+   */
+  url: string;
+  /**
+   * Debug
+   * @default false
+   */
+  debug?: boolean;
+  /**
+   * Expand the initial prompt.
+   * @default false
+   */
+  expandPrompt?: boolean;
+}
+
+export default async function rag(params: RAGParams) {
+  if (params.debug) {
+    l.silent = false;
+  }
+
   l.log("Starting...");
   const now = new Date();
 
-  const prompt = process.argv[2] ?? raise("No prompt provided");
+  let prompt = params.prompt;
+  l.log("Prompt:", prompt);
 
-  const id = "The_Dark_Knight";
-  const title = "The Dark Knight (film)";
-  const url = "https://en.wikipedia.org/wiki/The_Dark_Knight";
+  const url = params.url;
+  const id = getIDfromURL(url);
+  const title = params.title ?? getTitlefromURL(url);
 
   const db = await getDocDB(id, title, url);
   l.log("DB loaded");
-  const expandedPrompt = await expandPrompt(prompt, title);
-  l.log("Prompt expanded:", expandedPrompt);
+  if (params.expandPrompt) {
+    l.log("Expanding prompt...");
+    prompt = await expandPrompt(prompt, title);
+    l.log("Prompt expanded:", prompt);
+  }
 
-  const context = await getContext(expandedPrompt, db);
+  const context = await getContext(prompt, db);
   l.log("\n");
   l.log("Context:\n", context);
   l.log("\n");
-  await answer(expandedPrompt, context, title);
+  await answer(prompt, context, title);
   l.log("Done", new Date().getTime() - now.getTime(), "ms");
 }

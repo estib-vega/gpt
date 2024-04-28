@@ -6,8 +6,7 @@
   "scripts": {
     "test": "eslint src/ --ext .ts",
     "build": "webpack --config webpack.config.js",
-    "script": "ts-node src/index.ts",
-    "rag": "ts-node src/rag.ts"
+    "start": "ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -20,6 +19,7 @@
   },
   "homepage": "https://github.com/estib-vega/gpt#readme",
   "devDependencies": {
+    "@types/yargs": "^17.0.32",
     "@typescript-eslint/eslint-plugin": "^6.18.0",
     "@typescript-eslint/parser": "^6.18.0",
     "css-loader": "^6.8.1",
@@ -39,7 +39,8 @@
     "@langchain/community": "^0.0.44",
     "cheerio": "^1.0.0-rc.12",
     "hnswlib-node": "^1.4.2",
-    "langchain": "^0.1.31"
+    "langchain": "^0.1.31",
+    "yargs": "^17.7.2"
   },
   "resolutions": {
     "@langchain/core": "0.1.54"

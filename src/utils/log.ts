@@ -1,4 +1,5 @@
 interface Log {
+  silent: boolean;
   log: (...messages: unknown[]) => void;
   err: (...messages: unknown[]) => void;
 }
@@ -29,7 +30,7 @@ function logger(level: LogLevel, scope: string, messages: unknown[], silent: boo
  */
 export function initLog(scope: string): Log {
   const log = {
-    silent: false,
+    silent: true,
     log: (...messages: unknown[]) => logger(LogLevel.Info, scope, messages, log.silent),
     err: (...messages: unknown[]) => logger(LogLevel.Error, scope, messages, log.silent),
   };
