@@ -2,7 +2,7 @@ import { raise } from "./utils/errors";
 import { streamGenerator } from "./utils/promise";
 import { isNonEmptyObject } from "./utils/typing";
 
-const DEFAULT_LLM_ENDPOINT = "http://localhost:11434/api/";
+const DEFAULT_LLM_ENDPOINT = "http://127.0.0.1:11434/api/";
 const LLM_MODEL = "llama3";
 const LLM_TEMP = 0;
 

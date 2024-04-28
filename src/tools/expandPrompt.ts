@@ -42,9 +42,10 @@ export default async function expandPrompt(
       role: LLMChatRole.System,
       content: `You are a helpful assistant that is able to intuitively understand the intention of prompts.
 Please, expand the following PROMPT using the provided TOPIC as if you were writing the prompt.
+Don't change or add any new information like names or places.
+Don't assume or infer information.
 Don't change the meaning of the prompt, just add more information to it.
 Be detailed but concise.
-Don't change or add any new information like names or places.
 Use the following JSON schema in your response:
 ${ExpandedPromptResponseSchema}
 `,

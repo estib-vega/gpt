@@ -15,5 +15,8 @@
     "no-undef": "error",
     "prefer-const": "warn",
     "no-console": "warn"
+  },
+  "globals": {
+    "Bun": "readonly"
   }
 }

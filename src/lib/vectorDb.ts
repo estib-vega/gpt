@@ -3,7 +3,7 @@ import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import { raise } from "../utils/errors";
 
 const LLM_MODEL = "nomic-embed-text";
-const OLLAMA_BASE_URL = "http://localhost:11434";
+const OLLAMA_BASE_URL = "http://127.0.0.1:11434";
 
 export interface VectorStoreEntry<T extends object> {
   text: string;

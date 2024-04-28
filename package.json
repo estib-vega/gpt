@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/estib-vega/gpt#readme",
   "devDependencies": {
+    "@types/bun": "^1.1.0",
     "@types/yargs": "^17.0.32",
     "@typescript-eslint/eslint-plugin": "^6.18.0",
     "@typescript-eslint/parser": "^6.18.0",

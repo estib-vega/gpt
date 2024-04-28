@@ -1,7 +1,9 @@
 import { loadWikiArticle } from "./loaders/wiki";
-import extractInformation, { ParagraphInfo } from "./tools/paragraphInfo";
+import extractInformation from "./tools/paragraphInfo";
+import type { ParagraphInfo } from "./tools/paragraphInfo";
 import { splitIntoParragraphs } from "./utils/string";
-import VectorDB, { VectorStoreEntry } from "./lib/vectorDb";
+import VectorDB from "./lib/vectorDb";
+import type { VectorStoreEntry } from "./lib/vectorDb";
 import LLMHandler from "./llm";
 import { raise } from "./utils/errors";
 import expandPrompt from "./tools/expandPrompt";
@@ -132,20 +134,19 @@ async function getContext(prompt: string, db: VectorDB): Promise<string> {
   return hits.map((hit) => hit.text).join("\n");
 }
 
-async function answer(prompt: string, context: string, topic: string) {
+async function answer(prompt: string, context: string) {
   const llm = LLMHandler.getInstance();
   await llm.generateStream({
     prompt: `You are a reliable informant.
-Answer to the following PROMPT using *only* the information from the given CONTECT about the TOPIC.
-ONLY if the information is not enough, state clearly that the context is insufficient.
+Answer to the following PROMPT using ONLY the information from the given CONTEXT.
 It's important that you DON't infer or make up information.
 Be concise and to the point.
 
-TOPIC: ${topic}
+PROMPT:
+${prompt}
 
-PROMPT: ${prompt}
-
-CONTEXT: ${context}
+CONTEXT:
+${context}
 `,
     callback: (value) => {
       process.stdout.write(value);
@@ -161,7 +162,7 @@ function getIDfromURL(url: string): string {
 
 function getTitlefromURL(url: string): string {
   const id = getIDfromURL(url);
-  return id.replaceAll("_", " ");
+  return id.replace(/_/g, " ");
 }
 
 /**
@@ -219,6 +220,6 @@ export default async function rag(params: RAGParams) {
   l.log("\n");
   l.log("Context:\n", context);
   l.log("\n");
-  await answer(prompt, context, title);
+  await answer(prompt, context);
   l.log("Done", new Date().getTime() - now.getTime(), "ms");
 }
