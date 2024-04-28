@@ -6,7 +6,7 @@
   "scripts": {
     "test": "eslint src/ --ext .ts",
     "build": "webpack --config webpack.config.js",
-    "start": "ts-node src/index.ts"
+    "start": "bun run src/index.ts"
   },
   "repository": {
     "type": "git",
