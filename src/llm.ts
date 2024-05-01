@@ -1,6 +1,9 @@
 import { raise } from "./utils/errors";
+import { initLog } from "./utils/log";
 import { streamGenerator } from "./utils/promise";
 import { isNonEmptyObject } from "./utils/typing";
+
+const l = initLog("rag");
 
 const DEFAULT_LLM_ENDPOINT = "http://127.0.0.1:11434/api/";
 const LLM_MODEL = "llama3";
@@ -259,7 +262,7 @@ export default class LLMHandler {
    */
   async generateStream(params: LLMGenerateParams): Promise<void> {
     if (this.generationInProgress) {
-      console.log("Generation in progress");
+      l.log("Generation in progress");
       return;
     }
 

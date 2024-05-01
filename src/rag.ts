@@ -77,9 +77,11 @@ interface WikiDocumentEntryMetadata {
 async function getDocDB(
   id: string,
   title: string,
-  url: string
+  url: string,
+  outDir: string
 ): Promise<VectorDB> {
-  const dbPath = "/Users/estib/projects/gpt/db/wiki/" + id;
+  const dbPath = VectorDB.getWikiPath(outDir, id);
+  l.log("DB Path:", dbPath);
   const dbExists = await VectorDB.exists(dbPath);
   if (dbExists) {
     return VectorDB.get(dbPath);
@@ -170,6 +172,10 @@ function getTitlefromURL(url: string): string {
  */
 export interface RAGParams {
   /**
+   * The output directory.
+   */
+  outDir: string;
+  /**
    * The prompt.
    */
   prompt: string;
@@ -208,7 +214,7 @@ export default async function rag(params: RAGParams) {
   const id = getIDfromURL(url);
   const title = params.title ?? getTitlefromURL(url);
 
-  const db = await getDocDB(id, title, url);
+  const db = await getDocDB(id, title, url, params.outDir);
   l.log("DB loaded");
   if (params.expandPrompt) {
     l.log("Expanding prompt...");

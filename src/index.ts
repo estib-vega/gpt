@@ -9,6 +9,12 @@ function main() {
       "Execute retrieval augmented generation",
       (yargs) => {
         return yargs
+          .option("out-dir", {
+            alias: "o",
+            type: "string",
+            demandOption: true,
+            description: "The output directory",
+          })
           .option("wiki", {
             alias: "w",
             type: "string",
@@ -39,6 +45,7 @@ function main() {
       },
       (argv) => {
         rag({
+          outDir: argv.outDir,
           title: argv.topic,
           url: argv.wiki,
           prompt: argv.query,

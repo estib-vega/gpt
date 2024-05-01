@@ -1,7 +1,10 @@
+import path from "path";
 import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import { raise } from "../utils/errors";
 
+const DB_DIR = "db";
+const DB_WIKI_DIR = "wiki";
 const LLM_MODEL = "nomic-embed-text";
 const OLLAMA_BASE_URL = "http://127.0.0.1:11434";
 
@@ -79,6 +82,18 @@ export default class VectorDB {
   }
 
   /**
+   * Returns the path to the wiki directory for a given ID.
+   *
+   * @param outDir - The output directory.
+   * @param id - The ID of the wiki.
+   * @returns The path to the wiki directory.
+   */
+  static getWikiPath(outDir: string, id: string): string {
+    const o = path.join(outDir, DB_DIR, DB_WIKI_DIR, id);
+    return path.resolve(process.cwd(), o);
+  }
+
+  /**
    * Checks if a vector database exists at the specified path.
    * If the database exists, it will be loaded and stored in the internal map.
    *
@@ -150,7 +165,6 @@ export default class VectorDB {
     k: number,
     filter?: (metadata: T) => boolean
   ): Promise<VectorStoreEntry<T>[]> {
-
     const doc = await this.hnswlib.similaritySearch(
       text,
       k,
