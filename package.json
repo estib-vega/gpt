@@ -4,9 +4,14 @@
   "description": "Simple implementation of a GPT in typescript",
   "main": "index.js",
   "scripts": {
-    "test": "eslint src/ --ext .ts",
-    "build": "webpack --config webpack.config.js",
-    "start": "bun run src/index.ts"
+    "lint": "eslint src/ --ext .ts",
+    "build:mac": "bun build --compile --target=bun-darwin-arm64 src/index.ts --outfile dist/mac/gpt",
+    "build:win": "bun build --compile --target=bun-windows-x64 src/index.ts --outfile dist/win/gpt",
+    "build:lin": "bun build --compile --target=bun-linux-x64 src/index.ts --outfile dist/lin/gpt",
+    "build:all": "bun build:mac && bun build:win && bun build:lin",
+    "start:mac": "./dist/mac/gpt",
+    "start:win": "./dist/win/gpt",
+    "start:lin": "./dist/lin/gpt"
   },
   "repository": {
     "type": "git",
@@ -21,8 +26,8 @@
   "devDependencies": {
     "@types/bun": "^1.1.0",
     "@types/yargs": "^17.0.32",
-    "@typescript-eslint/eslint-plugin": "^6.18.0",
-    "@typescript-eslint/parser": "^6.18.0",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
     "css-loader": "^6.8.1",
     "eslint": "^8.56.0",
     "file-loader": "^6.2.0",
