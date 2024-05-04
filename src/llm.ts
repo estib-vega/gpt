@@ -1,3 +1,4 @@
+import path from "path";
 import { raise } from "./utils/errors";
 import { initLog } from "./utils/log";
 import { streamGenerator } from "./utils/promise";
@@ -198,7 +199,7 @@ export default class LLMHandler {
   }
 
   private fetchChat(request: LLMChatRequest): Promise<Response> {
-    const url = new URL(LLMAPEndpoint.Chat, DEFAULT_LLM_ENDPOINT);
+    const url = path.join(DEFAULT_LLM_ENDPOINT, LLMAPEndpoint.Chat);
     return fetch(url, {
       method: "POST",
       headers: {
@@ -215,7 +216,7 @@ export default class LLMHandler {
    * @returns A Promise that resolves to a Response object representing the server's response.
    */
   private fetchGenerate(request: LLMGenerateRequest): Promise<Response> {
-    const url = new URL(LLMAPEndpoint.Generate, DEFAULT_LLM_ENDPOINT);
+    const url = path.join(DEFAULT_LLM_ENDPOINT, LLMAPEndpoint.Generate);
     return fetch(url, {
       method: "POST",
       headers: {
@@ -275,7 +276,7 @@ export default class LLMHandler {
       options: {
         temperature: params.temperature ?? LLM_TEMP,
       },
-    }).then((response) => response.body);
+    }).then((response) => response.body as ReadableStream<Uint8Array> | null);
 
     if (!response) {
       return;
@@ -294,20 +295,5 @@ export default class LLMHandler {
         this.generationInProgress = false;
       }
     }
-  }
-
-  async embed(text: string): Promise<number[]> {
-    const url = new URL(LLMAPEndpoint.Embed, DEFAULT_LLM_ENDPOINT);
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: LLM_MODEL,
-        text,
-      }),
-    }).then((response) => response.json());
-    return response.embedding;
   }
 }

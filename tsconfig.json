@@ -26,5 +26,6 @@
     "target": "ESNext",
     "module": "ESNext",
   },
+  "types": ["bun-types"],
   "include": ["src"]
 }
