@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src/ --ext .ts",
-    "build:mac": "bun build --compile --target=bun-darwin-arm64 src/index.ts --outfile dist/mac/gpt",
-    "build:win": "bun build --compile --target=bun-windows-x64 src/index.ts --outfile dist/win/gpt",
-    "build:lin": "bun build --compile --target=bun-linux-x64 src/index.ts --outfile dist/lin/gpt",
+    "build:mac": "bun build --compile --target=bun-darwin-arm64 src/index.ts --outfile dist/mac/gpt --external hnswlib-node",
+    "build:win": "bun build --compile --target=bun-windows-x64 src/index.ts --outfile dist/win/gpt --external hnswlib-node",
+    "build:lin": "bun build --compile --target=bun-linux-x64 src/index.ts --outfile dist/lin/gpt --external hnswlib-node",
     "build:all": "bun build:mac && bun build:win && bun build:lin",
     "start:mac": "./dist/mac/gpt",
     "start:win": "./dist/win/gpt",
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/estib-vega/gpt#readme",
   "devDependencies": {
-    "@types/bun": "^1.1.0",
+    "@types/bun": "^1.1.1",
     "@types/yargs": "^17.0.32",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
@@ -44,7 +44,7 @@
   "dependencies": {
     "@langchain/community": "^0.0.44",
     "cheerio": "^1.0.0-rc.12",
-    "hnswlib-node": "^1.4.2",
+    "hnswlib-node": "^3.0.0",
     "langchain": "^0.1.31",
     "yargs": "^17.7.2"
   },
