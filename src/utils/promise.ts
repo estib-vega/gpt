@@ -20,3 +20,22 @@ export async function* streamGenerator(
     reader.releaseLock();
   }
 }
+
+/**
+ * Converts a ReadableStream to a Promise that resolves to a Uint8Array.
+ *
+ * @param stream The ReadableStream to convert to a Uint8Array.
+ * @returns A Promise that resolves to a Uint8Array.
+ */
+export async function streamToUint8Array(
+  stream: ReadableStream<Uint8Array>
+): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of streamGenerator(reader)) {
+    chunks.push(chunk);
+  }
+  return new Uint8Array(
+    chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+  );
+}
