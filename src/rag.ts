@@ -11,6 +11,8 @@ import { initLog } from "./utils/log";
 
 const l = initLog("rag");
 
+// chunk 1
+
 interface ChunkInfo {
   content: string;
   info: ParagraphInfo;
@@ -37,7 +39,7 @@ async function digestWikiArticle(
     }
 
     const now = new Date();
-    l.log("Processing chunk:", chunk);
+    l.log("processing chunk:", chunk);
     try {
       const paragraphInfo = await extractInformation(topic, chunk);
       documentInfo.push({
