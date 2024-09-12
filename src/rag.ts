@@ -60,6 +60,8 @@ async function digestWikiArticle(
   return documentInfo;
 }
 
+// chuck 2
+
 enum WikiDocumentEntryType {
   Fact = "fact",
   Chunk = "chunk",
@@ -166,6 +168,8 @@ function getTitlefromURL(url: string): string {
   const id = getIDfromURL(url);
   return id.replace(/_/g, " ");
 }
+
+// chunk 3
 
 /**
  * Represents the parameters for Retrieval Augmented Generation.
