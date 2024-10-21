@@ -2,6 +2,7 @@
 
 This repository contains the code for the GPT project.
 
+
 ## Description
 
 This is an implementation of RAG using Ollama + Langchain and some custom heuristics implemented in Typescript.
