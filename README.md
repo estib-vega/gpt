@@ -2,6 +2,8 @@
 
 This or is it kjhkjhk the code for the GPT project.
 
+yay
+
 ## Description
 
 This is an implementation of RAG using Ollama + Langchain and some custom heuristics implemented in Typescript.
