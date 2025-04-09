@@ -1,8 +1,6 @@
 # gpt
 
 This repository contains the code for the GPT project.
-ubiubiubiub
-jndoueno
 
 ## Description
 
@@ -16,9 +14,9 @@ It's a CLI app that is built into a platform-specific binaries that can be run a
 ## Prerequisites
 
 - **Bun** \
-This project uses [Bun v1.1.7](https://bun.sh/blog/bun-v1.1.7) as the TS runtime
+  This project uses [Bun v1.1.7](https://bun.sh/blog/bun-v1.1.7) as the TS runtime
 - **Ollama** \
-It connects to Ollama to access the LLMs. Ollama needs to be running in the background (http://127.0.0.1:11434) and have the following models installed:
+  It connects to Ollama to access the LLMs. Ollama needs to be running in the background (http://127.0.0.1:11434) and have the following models installed:
   - llama3 (8B)
   - nomic-embed-text
 
@@ -35,16 +33,19 @@ bun install
 ### 2. Build the binary:
 
 macOS
+
 ```bash
 bun build:mac
 ```
 
 Linux
+
 ```bash
 bun build:lin
 ```
 
 Windows
+
 ```bash
 bun build:win
 ```
@@ -52,16 +53,19 @@ bun build:win
 ### 3. Run it
 
 macOS
+
 ```bash
 ./dist/mac/gpt
 ```
 
 Linux
+
 ```bash
 ./dist/lin/gpt
 ```
 
 macOS
+
 ```bash
 ./dist/win/gpt.exe
 ```
