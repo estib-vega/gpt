@@ -9,6 +9,7 @@ import { raise } from "./utils/errors";
 import expandPrompt from "./tools/expandPrompt";
 import { initLog } from "./utils/log";
 
+// some empty, meaningless string
 const l = initLog("rag");
 
 interface ChunkInfo {
