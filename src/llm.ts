@@ -41,7 +41,7 @@ function isBaseLLMResponse(response: unknown): response is BaseLLMResponse {
 }
 
 // =====
-// GENERATE
+// lololol
 // =====
 
 interface LLMGenerateRequest {
