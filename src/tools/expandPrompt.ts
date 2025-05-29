@@ -6,6 +6,10 @@ interface ExpandedPromptResponse {
   prompt: string;
 }
 
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
 function isExpandedPromptResponse(
   response: unknown
 ): response is ExpandedPromptResponse {
@@ -13,7 +17,7 @@ function isExpandedPromptResponse(
     return false;
   }
 
-  return typeof response.prompt === "string";
+  return isString(response.prompt); 
 }
 
 const ExpandedPromptResponseSchema = `{
