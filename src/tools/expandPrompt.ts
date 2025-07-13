@@ -1,4 +1,4 @@
-import { isNonEmptyObject } from "../utils/typing";
+import { isNonEmptyObject, isStr } from "../utils/typing";
 import LLMHandler, { LLMChatRole } from "../llm";
 import { raise } from "../utils/errors";
 
@@ -13,7 +13,7 @@ function isExpandedPromptResponse(
     return false;
   }
 
-  return typeof response.prompt === "string";
+  return isStr(response.prompt);
 }
 
 const ExpandedPromptResponseSchema = `{
