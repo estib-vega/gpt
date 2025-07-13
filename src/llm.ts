@@ -1,8 +1,9 @@
 import path from "path";
+import { ReadableStreamDefaultReader } from "web-streams-polyfill/ponyfill";
 import { raise } from "./utils/errors";
 import { initLog } from "./utils/log";
 import { streamGenerator } from "./utils/promise";
-import { isNonEmptyObject } from "./utils/typing";
+import { isNonEmptyObject, isStr } from "./utils/typing";
 
 const l = initLog("rag");
 
@@ -34,9 +35,9 @@ function isBaseLLMResponse(response: unknown): response is BaseLLMResponse {
     return false;
   }
   return (
-    typeof response.created_at === "string" &&
+    isStr(response.created_at) &&
     typeof response.done === "boolean" &&
-    typeof response.model === "string"
+    isStr(response.model)
   );
 }
 
@@ -284,7 +285,9 @@ export default class LLMHandler {
 
     const buffer: string[] = [];
 
-    for await (const value of streamGenerator(response.getReader())) {
+    for await (const value of streamGenerator(
+      response.getReader() as UintStreamReader
+    )) {
       const parsed = this.decodeStream(value);
       buffer.push(parsed.response);
       params.callback(parsed.response);
@@ -297,3 +300,4 @@ export default class LLMHandler {
     }
   }
 }
+type UintStreamReader = ReadableStreamDefaultReader<Uint8Array>;

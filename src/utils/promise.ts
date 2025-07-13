@@ -32,7 +32,7 @@ export async function streamToUint8Array(
 ): Promise<Uint8Array> {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
-  for await (const chunk of streamGenerator(reader)) {
+  for await (const chunk of streamGenerator(reader as ReadableStreamDefaultReader<Uint8Array>)) {
     chunks.push(chunk);
   }
   return new Uint8Array(
