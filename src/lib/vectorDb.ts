@@ -24,7 +24,7 @@ function getEmbeddings(): OllamaEmbeddings {
  * Loads a vector store from the specified database path.
  * If `embeddings` are provided, they will be used to load the vector store.
  * If `embeddings` are not provided, default embeddings will be used.
- * Returns a promise that resolves to the loaded HNSWLib instance, or undefined if loading fails.
+ * Returns a promise that resolves to the loaded HNSWLib instance, or undefined if loading did not succeed.
  *
  * @param dbPath - The path to the vector database.
  * @param embeddings - Optional embeddings to use for loading the vector store.
