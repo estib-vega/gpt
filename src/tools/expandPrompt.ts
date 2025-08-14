@@ -26,11 +26,11 @@ const ExpandedPromptResponseSchema = `{
 }`;
 
 /**
- * Erweitert einen Prompt mit dem angegebenen Thema.
+ * Expands a prompt with the given topic.
  *
- * @param prompt - Der zu erweiternde Prompt.
- * @param topic - Das Thema, das zur Erweiterung des Prompts verwendet wird.
- * @returns Ein Promise, das zum erweiterten Prompt aufgelöst wird.
+ * @param prompt - The prompt to be expanded.
+ * @param topic - The topic used to expand the prompt.
+ * @returns A Promise that resolves to the expanded prompt.
  */
 export default async function expandPrompt(
   prompt: string,
