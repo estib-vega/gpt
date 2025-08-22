@@ -103,7 +103,7 @@ type LLMGenerateResponse =
   | LLMGenerateResponseCompleted;
 
 // =====
-// CHAT hello there
+// CHAT bla bla
 // =====
 
 export enum LLMChatRole {
