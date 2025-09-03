@@ -253,6 +253,8 @@ export default class LLMHandler {
       );
   }
 
+  // four
+
   /**
    * Generates a stream of responses based on the given prompt using the LLM model.
    *
