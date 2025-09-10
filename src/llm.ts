@@ -103,7 +103,7 @@ type LLMGenerateResponse =
   | LLMGenerateResponseCompleted;
 
 // =====
-// CHAT
+// CHAT hello there
 // =====
 
 export enum LLMChatRole {
@@ -141,6 +141,8 @@ function isLLMChatResponse(response: unknown): response is LLMChatResponse {
     typeof response.message.content === "string"
   );
 }
+
+//
 
 interface LLMGenerateParams {
   prompt: string;
