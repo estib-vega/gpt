@@ -29,6 +29,8 @@ interface BaseLLMResponse {
   model: string;
 }
 
+// Another
+
 function isBaseLLMResponse(response: unknown): response is BaseLLMResponse {
   if (!isNonEmptyObject(response)) {
     return false;
