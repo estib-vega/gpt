@@ -201,6 +201,13 @@ export interface RAGParams {
   expandPrompt?: boolean;
 }
 
+/**
+ * Performs Retrieval-Augmented Generation (RAG) to answer questions using Wikipedia content.
+ * Processes a Wikipedia article, creates embeddings, retrieves relevant context, and generates an answer.
+ * 
+ * @param params - Configuration object for the RAG process
+ * @returns Promise resolving to the generated answer string
+ */
 export default async function rag(params: RAGParams) {
   if (params.debug) {
     l.silent = false;
