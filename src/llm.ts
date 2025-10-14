@@ -29,6 +29,8 @@ interface BaseLLMResponse {
   model: string;
 }
 
+// Another
+
 function isBaseLLMResponse(response: unknown): response is BaseLLMResponse {
   if (!isNonEmptyObject(response)) {
     return false;
@@ -103,7 +105,7 @@ type LLMGenerateResponse =
   | LLMGenerateResponseCompleted;
 
 // =====
-// CHAT
+// CHAT hello there
 // =====
 
 export enum LLMChatRole {
@@ -142,6 +144,8 @@ function isLLMChatResponse(response: unknown): response is LLMChatResponse {
   );
 }
 
+//
+
 interface LLMGenerateParams {
   prompt: string;
   temperature?: number;
@@ -166,6 +170,7 @@ export default class LLMHandler {
     return LLMHandler.instance;
   }
 
+  // Another 3
   /**
    * Returns the request body as a JSON string.
    *
@@ -252,6 +257,8 @@ export default class LLMHandler {
           : raise("Invalid response\n" + JSON.stringify(json))
       );
   }
+
+  // four
 
   /**
    * Generates a stream of responses based on the given prompt using the LLM model.
