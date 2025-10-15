@@ -2,6 +2,7 @@ import rag from "./rag";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
+// This is another change
 function main() {
   return yargs(hideBin(process.argv))
     .command(
