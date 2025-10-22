@@ -18,6 +18,8 @@ function isExpandedPromptResponse(
   return typeof response.prompt === "string";
 }
 
+// Define the JSON schema for the expanded prompt response
+
 const ExpandedPromptResponseSchema = `{
   type: "object",
   properties: {
