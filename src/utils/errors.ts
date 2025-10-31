@@ -1,8 +1,8 @@
 /**
- * Raises an error with the specified message.
- * @param message - The error message.
- * @returns This function never returns a value.
- * @throws {Error} - The error object with the specified message.
+ * Lanza un error con el mensaje especificado.
+ * @param message - El mensaje de error.
+ * @returns Esta función nunca devuelve un valor.
+ * @throws {Error} - El objeto de error con el mensaje especificado.
  */
 export function raise(message: string): never {
   throw new Error(message);

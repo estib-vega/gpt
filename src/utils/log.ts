@@ -24,9 +24,9 @@ function logger(level: LogLevel, scope: string, messages: unknown[], silent: boo
 }
 
 /**
- * Initializes a logger with the specified scope.
- * @param scope - The scope of the logger.
- * @returns The logger object with log and err methods.
+ * Inicializa un logger con el ámbito especificado.
+ * @param scope - El ámbito del logger.
+ * @returns El objeto logger con métodos log y err.
  */
 export function initLog(scope: string): Log {
   const log = {

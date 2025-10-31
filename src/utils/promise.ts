@@ -1,9 +1,9 @@
 import { ReadableStreamDefaultReader } from "web-streams-polyfill/ponyfill";
 /**
- * Generates a stream of values from a ReadableStreamDefaultReader.
+ * Genera un flujo de valores desde un ReadableStreamDefaultReader.
  *
- * @param reader The ReadableStreamDefaultReader to generate values from.
- * @yields The values read from the reader.
+ * @param reader El ReadableStreamDefaultReader desde el cual generar valores.
+ * @yields Los valores leídos desde el reader.
  */
 export async function* streamGenerator(
   reader: ReadableStreamDefaultReader<Uint8Array>
@@ -22,10 +22,10 @@ export async function* streamGenerator(
 }
 
 /**
- * Converts a ReadableStream to a Promise that resolves to a Uint8Array.
+ * Convierte un ReadableStream a una Promesa que se resuelve a un Uint8Array.
  *
- * @param stream The ReadableStream to convert to a Uint8Array.
- * @returns A Promise that resolves to a Uint8Array.
+ * @param stream El ReadableStream a convertir a un Uint8Array.
+ * @returns Una promesa que se resuelve a un Uint8Array.
  */
 export async function streamToUint8Array(
   stream: ReadableStream<Uint8Array>

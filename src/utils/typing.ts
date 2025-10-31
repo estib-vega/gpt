@@ -1,8 +1,8 @@
 /**
- * Checks if the given value is a string.
+ * Verifica si el valor dado es una cadena.
  *
- * @param something - The value to check.
- * @returns `true` if the value is a string, `false` otherwise.
+ * @param something - El valor a verificar.
+ * @returns `true` si el valor es una cadena, `false` en caso contrario.
  */
 export function isStr(something: unknown): something is string {
   return typeof something === "string";
@@ -22,10 +22,10 @@ export function isEnumEntry<T extends string>(
 export type UnknownObject = Record<string, unknown>;
 
 /**
- * Checks if the given value is an object.
+ * Verifica si el valor dado es un objeto.
  *
- * @param something - The value to check.
- * @returns `true` if the value is an object, `false` otherwise.
+ * @param something - El valor a verificar.
+ * @returns `true` si el valor es un objeto, `false` en caso contrario.
  */
 export function isNonEmptyObject(something: unknown): something is UnknownObject {
   return (

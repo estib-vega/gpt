@@ -26,12 +26,12 @@ const RateRelevanceResponseSchema = `{
 }`;
 
 /**
- * Rates the relevance of a given text to a provided prompt about a specific topic.
+ * Califica la relevancia de un texto dado con respecto a un prompt proporcionado sobre un tema específico.
  *
- * @param prompt - The prompt for the text.
- * @param topic - The topic of the text.
- * @param text - The text to be rated for relevance.
- * @returns A promise that resolves to a number representing the relevance rating.
+ * @param prompt - El prompt para el texto.
+ * @param topic - El tema del texto.
+ * @param text - El texto a calificar por relevancia.
+ * @returns Una promesa que se resuelve a un número que representa la calificación de relevancia.
  */
 export default async function rateRelevance(
   prompt: string,

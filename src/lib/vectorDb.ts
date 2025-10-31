@@ -21,14 +21,14 @@ function getEmbeddings(): OllamaEmbeddings {
 }
 
 /**
- * Loads a vector store from the specified database path.
- * If `embeddings` are provided, they will be used to load the vector store.
- * If `embeddings` are not provided, default embeddings will be used.
- * Returns a promise that resolves to the loaded HNSWLib instance, or undefined if loading did not succeed.
+ * Carga un almacén vectorial desde la ruta de base de datos especificada.
+ * Si se proporcionan `embeddings`, se utilizarán para cargar el almacén vectorial.
+ * Si no se proporcionan `embeddings`, se utilizarán embeddings por defecto.
+ * Devuelve una promesa que se resuelve a la instancia HNSWLib cargada, o undefined si la carga no tuvo éxito.
  *
- * @param dbPath - The path to the vector database.
- * @param embeddings - Optional embeddings to use for loading the vector store.
- * @returns A promise that resolves to the loaded HNSWLib instance, or undefined if loading fails.
+ * @param dbPath - La ruta a la base de datos vectorial.
+ * @param embeddings - Embeddings opcionales para usar al cargar el almacén vectorial.
+ * @returns Una promesa que se resuelve a la instancia HNSWLib cargada, o undefined si la carga falla.
  */
 async function loadVectorStore(
   dbPath: string,
@@ -40,10 +40,10 @@ async function loadVectorStore(
 }
 
 /**
- * Retrieves or creates a vector store using the provided entries and database path.
- * @param entries - An array of VectorStoreEntry objects.
- * @param dbPath - Optional path to an existing vector store database.
- * @returns A Promise that resolves to a HNSWLib instance representing the vector store.
+ * Recupera o crea un almacén vectorial utilizando las entradas y ruta de base de datos proporcionadas.
+ * @param entries - Un arreglo de objetos VectorStoreEntry.
+ * @param dbPath - Ruta opcional a una base de datos de almacén vectorial existente.
+ * @returns Una promesa que se resuelve a una instancia HNSWLib que representa el almacén vectorial.
  */
 export async function getOrCreateVectorStore<T extends object>(
   entries: VectorStoreEntry<T>[],
@@ -82,11 +82,11 @@ export default class VectorDB {
   }
 
   /**
-   * Returns the path to the wiki directory for a given ID.
+   * Devuelve la ruta al directorio wiki para un ID dado.
    *
-   * @param outDir - The output directory.
-   * @param id - The ID of the wiki.
-   * @returns The path to the wiki directory.
+   * @param outDir - El directorio de salida.
+   * @param id - El ID del wiki.
+   * @returns La ruta al directorio wiki.
    */
   static getWikiPath(outDir: string, id: string): string {
     const o = path.join(outDir, DB_DIR, DB_WIKI_DIR, id);
@@ -94,11 +94,11 @@ export default class VectorDB {
   }
 
   /**
-   * Checks if a vector database exists at the specified path.
-   * If the database exists, it will be loaded and stored in the internal map.
+   * Verifica si existe una base de datos vectorial en la ruta especificada.
+   * Si la base de datos existe, se cargará y almacenará en el mapa interno.
    *
-   * @param dbPath - The path to the vector database.
-   * @returns A promise that resolves to a boolean indicating whether the database exists.
+   * @param dbPath - La ruta a la base de datos vectorial.
+   * @returns Una promesa que se resuelve a un booleano indicando si la base de datos existe.
    */
   static async exists(dbPath: string): Promise<boolean> {
     if (VectorDB.dbMap.has(dbPath)) {
@@ -115,11 +115,11 @@ export default class VectorDB {
   }
 
   /**
-   * Retrieves a VectorDB instance based on the provided database path.
+   * Recupera una instancia de VectorDB basada en la ruta de base de datos proporcionada.
    *
-   * @param dbPath - The path of the VectorDB.
-   * @returns The VectorDB instance.
-   * @throws An error if the VectorDB is not found in the specified path.
+   * @param dbPath - La ruta del VectorDB.
+   * @returns La instancia de VectorDB.
+   * @throws Un error si el VectorDB no se encuentra en la ruta especificada.
    */
   static get(dbPath: string): VectorDB {
     return (
@@ -129,12 +129,12 @@ export default class VectorDB {
   }
 
   /**
-   * Retrieves an existing VectorDB instance for the specified database path,
-   * or creates a new one if it doesn't exist.
+   * Recupera una instancia existente de VectorDB para la ruta de base de datos especificada,
+   * o crea una nueva si no existe.
    *
-   * @param dbPath - The path to the vector database.
-   * @param entries - An array of VectorStoreEntry objects.
-   * @returns A Promise that resolves to a VectorDB instance.
+   * @param dbPath - La ruta a la base de datos vectorial.
+   * @param entries - Un arreglo de objetos VectorStoreEntry.
+   * @returns Una promesa que se resuelve a una instancia de VectorDB.
    */
   static async getOrCreate<T extends object>(
     dbPath: string,
@@ -152,13 +152,13 @@ export default class VectorDB {
   }
 
   /**
-   * Retrieves the nearest neighbor information for a given text.
+   * Recupera la información del vecino más cercano para un texto dado.
    *
-   * @template T - The type of the metadata object.
-   * @param {string} text - The text to search for nearest neighbors.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @param {function} [filter] - An optional filter function to apply to the metadata objects.
-   * @returns {Promise<DocumentInformation<T>[]>} - A promise that resolves to an array of nearest neighbor metadata objects.
+   * @template T - El tipo del objeto de metadatos.
+   * @param {string} text - El texto para buscar vecinos más cercanos.
+   * @param {number} k - El número de vecinos más cercanos a recuperar.
+   * @param {function} [filter] - Una función de filtro opcional para aplicar a los objetos de metadatos.
+   * @returns {Promise<DocumentInformation<T>[]>} - Una promesa que se resuelve a un arreglo de objetos de metadatos de vecinos más cercanos.
    */
   async getNearestNeighbors<T extends object>(
     text: string,
@@ -177,9 +177,9 @@ export default class VectorDB {
   }
 
   /**
-   * Saves the vector database.
+   * Guarda la base de datos vectorial.
    *
-   * @returns A promise that resolves when the save operation is complete.
+   * @returns Una promesa que se resuelve cuando la operación de guardado está completa.
    */
   save(): Promise<void> {
     return this.hnswlib.save(this.dbPath);

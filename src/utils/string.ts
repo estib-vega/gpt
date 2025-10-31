@@ -1,8 +1,8 @@
 /**
- * Splits a given text into an array of paragraphs.
+ * Divide un texto dado en un arreglo de párrafos.
  *
- * @param text - The text to be split into paragraphs.
- * @returns An array of paragraphs.
+ * @param text - El texto a dividir en párrafos.
+ * @returns Un arreglo de párrafos.
  */
 export function splitIntoParragraphs(text: string | undefined): string[] {
   if (!text) return [];
