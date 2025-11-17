@@ -6,7 +6,7 @@ interface RateRelevanceResponse {
   relevance: number;
 }
 
-/// Hello, hows it going?
+/// Hello, hows it going? it's a nice day to code some typescript, isn't it?
 
 function isRateRelevanceResponse(
   response: unknown
