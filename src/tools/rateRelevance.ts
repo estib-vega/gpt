@@ -6,6 +6,8 @@ interface RateRelevanceResponse {
   relevance: number;
 }
 
+/// Hello
+
 function isRateRelevanceResponse(
   response: unknown
 ): response is RateRelevanceResponse {
