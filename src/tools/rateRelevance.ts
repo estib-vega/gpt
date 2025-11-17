@@ -18,6 +18,8 @@ function isRateRelevanceResponse(
   return typeof response.relevance === "number";
 }
 
+// JSON schema for the RateRelevanceResponse
+
 const RateRelevanceResponseSchema = `{
   type: "object",
   properties: {
