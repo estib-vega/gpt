@@ -6,7 +6,7 @@ interface RateRelevanceResponse {
   relevance: number;
 }
 
-/// Hello, hows it going?
+/// Hello, hows it going? it's a nice day to code some typescript, isn't it?
 
 function isRateRelevanceResponse(
   response: unknown
@@ -17,6 +17,8 @@ function isRateRelevanceResponse(
 
   return typeof response.relevance === "number";
 }
+
+// JSON schema for the RateRelevanceResponse
 
 const RateRelevanceResponseSchema = `{
   type: "object",
