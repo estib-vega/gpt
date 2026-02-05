@@ -1,6 +1,6 @@
 # gpt
 
-This or is it kjhkjhk the code for the GPT project.
+A test repo
 
 ## Description
 
