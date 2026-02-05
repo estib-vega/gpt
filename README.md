@@ -2,6 +2,8 @@
 
 A test repo
 
+A great repo
+
 ## Description
 
 This is an implementation of RAG using Ollama + Langchain and some custom heuristics implemented in Typescript.
