@@ -1,12 +1,6 @@
 # gpt
 
-A test repo
-
-A great repo
-
-A third change
-
-A fourth change
+Now we're talking
 
 ## Description
 
