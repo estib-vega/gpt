@@ -1,8 +1,6 @@
 # gpt
 
-A third change
-
-A fourth change
+Now we're talking
 
 ## Description
 
