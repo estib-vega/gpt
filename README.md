@@ -1,7 +1,5 @@
 # gpt
 
-A great repo
-
 A third change
 
 A fourth change
