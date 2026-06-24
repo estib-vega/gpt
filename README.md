@@ -1,6 +1,5 @@
 # gpt
 
-bla 2
 bla 3
 A test repo
 
