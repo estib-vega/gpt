@@ -1,7 +1,5 @@
 # gpt
 
-A test repo
-
 A great repo
 
 A third change
