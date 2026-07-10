@@ -6,6 +6,8 @@ interface ExpandedPromptResponse {
   prompt: string;
 }
 
+// this is another change
+
 function isExpandedPromptResponse(
   response: unknown
 ): response is ExpandedPromptResponse {
